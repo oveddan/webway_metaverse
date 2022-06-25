@@ -4,6 +4,7 @@ import { Vector3 } from "three";
 import { Nullable } from "../Config/types/shared";
 import ModelElement from "./ModelElement";
 import ElementsTree from "./ElementsTree";
+import WaterElement from "./WaterElement";
 
 const useTransform = (transformConfig?: Nullable<Transform>) => {
   const [transform, setTransform] = useState<{
@@ -34,7 +35,7 @@ const useTransform = (transformConfig?: Nullable<Transform>) => {
       rotation: rotationVector,
       scale: scaleVector,
     });
-  }, [transformConfig]);
+  }, [transform, transformConfig]);
 
   return transform;
 };
@@ -51,6 +52,10 @@ const ElementComponent = ({ config }: { config: Element }) => {
     >
       {config.elementType === ElementType.Model && (
         <ModelElement config={config.modelConfig} />
+      )}
+
+      {config.elementType === ElementType.Water && (
+        <WaterElement config={config.waterConfig} />
       )}
 
       <ElementsTree elements={config.children} />

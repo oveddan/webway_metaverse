@@ -3,6 +3,7 @@ import { Nullable } from "./shared";
 export enum ElementType {
   Model = "model",
   Image = "image",
+  Water = "water",
 }
 
 export type IVector3 = {
@@ -33,7 +34,12 @@ export type ImageElement = BaseElement & {
   imageConfig: ImageConfig;
 };
 
-export type Element = ModelElement | ImageElement;
+export type WaterElement = BaseElement & {
+  elementType: ElementType.Water;
+  waterConfig: WaterConfig;
+};
+
+export type Element = ModelElement | ImageElement | WaterElement;
 
 export type ModelConfig = {
   fileUrl?: Nullable<string>;
@@ -41,4 +47,12 @@ export type ModelConfig = {
 
 export type ImageConfig = {
   fileUrl: string;
+};
+
+export type WaterConfig = {
+  width: number;
+  height: number;
+  flowSpeed: number;
+  color: string;
+  scale: number;
 };

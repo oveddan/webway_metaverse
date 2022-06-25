@@ -6,7 +6,7 @@ const ElementsTree = ({ elements }: Pick<SceneConfiguration, "elements">) => {
   return (
     <>
       {elements.map((element, i) => (
-        <Element config={element} />
+        <Element config={element} key={i} />
       ))}
     </>
   );

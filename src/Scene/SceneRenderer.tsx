@@ -1,19 +1,20 @@
 import { Canvas } from "@react-three/fiber";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import ErrorBoundary from "../shared/ErrorBoundary";
 import Controls from "./Controls";
 import ElementsTree from "./Elements/ElementsTree";
 import Environment from "./Elements/Environment";
-import { useTokenScene } from "./lib/queries";
 
-const Root = () => {
-  const { tokenId } = useParams<{
-    tokenId: string;
-  }>();
+import { SceneConfiguration } from "./Config/types/scene";
 
-  const { loading, scene: sceneConfig, valid } = useTokenScene(tokenId);
-
+const SceneRenderer = ({
+  loading,
+  valid,
+  scene,
+}: {
+  loading: boolean;
+  valid?: boolean;
+  scene?: SceneConfiguration;
+}) => {
   if (loading) return <h1>loading...</h1>;
 
   if (!valid) return <h1>Invalid token id</h1>;
@@ -21,10 +22,10 @@ const Root = () => {
   return (
     <Canvas>
       <ErrorBoundary>
-        {sceneConfig && (
+        {scene && (
           <>
-            <Environment environment={sceneConfig.environment} />
-            <ElementsTree elements={sceneConfig.elements} />
+            <Environment environment={scene.environment} />
+            <ElementsTree elements={scene.elements} />
           </>
         )}
         <Controls />
@@ -33,4 +34,4 @@ const Root = () => {
   );
 };
 
-export default Root;
+export default SceneRenderer;
