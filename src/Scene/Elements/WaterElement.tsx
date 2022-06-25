@@ -13,7 +13,6 @@ import { Water } from "three/examples/jsm/objects/Water2";
 import { WaterConfig } from "../Config/types/elements";
 import { convertURIToHTTPS, toIpfsUrl } from "../lib/ipfs";
 
-
 const toUrlFromIpfs = (cid: string) =>
   convertURIToHTTPS({ url: toIpfsUrl(cid) });
 

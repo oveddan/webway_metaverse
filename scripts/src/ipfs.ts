@@ -135,7 +135,7 @@ const publishFilesInGraphToIpfs = async (
     elements: config.elements
       ? await publishElementsToIps(config.elements)
       : undefined,
-    availableMods: config.availableMods
+    availableMods: config.availableMods,
   };
 };
 
@@ -246,7 +246,7 @@ const publishNft = async ({
   const tokenIpfsCif = await ipfs.add(JSON.stringify(tokenMetadata, null, 2));
 
   const tokenIpfsCifUrl = toIpfsAddress(tokenIpfsCif.cid);
-  console.log('published to:', tokenIpfsCifUrl);
+  console.log("published to:", tokenIpfsCifUrl);
 };
 
 publishNft({

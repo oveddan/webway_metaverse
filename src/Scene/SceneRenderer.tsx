@@ -5,65 +5,81 @@ import ElementsTree from "./Elements/ElementsTree";
 import Environment from "./Elements/Environment";
 
 import { SceneConfiguration } from "./Config/types/scene";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import ModificationControls, {
+  AppliedModifications,
+} from "../UI/ModificationControls";
+import useApplyModifications from "./Config/useApplyModifications";
 
 const SceneRenderer = ({
   loading,
   valid,
   scene,
-canModify
+  canModify,
 }: {
   loading: boolean;
   valid?: boolean;
   scene?: SceneConfiguration;
-canModify?: boolean;
+  canModify?: boolean;
 }) => {
-  if (loading) return <h1>loading...</h1>;
+  const [appliedModification, setAppliedModifications] =
+    useState<AppliedModifications>({});
 
-  if (!valid) return <h1>Invalid token id</h1>;
-
-  const [appliedModification, setAppliedModifications] = useState<
-    {
-      [key: string]: {
-        applied: boolean,
-        processing: boolean,
-      error: boolean
-      }
-    }
-  >({})
-
-  const updateModification = useCallback((key: string, apply: boolean) => {
-    setAppliedModifications(existing => {
+  const toggleApplied = useCallback((key: string) => {
+    setAppliedModifications((existing) => {
       const existingApplied = existing[key];
 
       if (existingApplied?.processing) return existing;
-    
-      return {
+
+      const updated = {
         ...existing,
         [key]: {
-          applied: apply,
+          applied: !existingApplied?.applied,
           processing: false,
-          error: false
-        }
-      }
-    })
+          error: false,
+        },
+      };
+
+      console.log(
+        "updating",
+
+        { checked: !existingApplied?.applied, key, update: updated[key] }
+      );
+
+      return updated;
+    });
   }, []);
+
+  const sceneWithMods = useApplyModifications({
+    scene,
+    appliedModifications: appliedModification,
+  });
+
+  if (loading || !sceneWithMods) return <h1>loading...</h1>;
+
+  if (!valid) return <h1>Invalid token id</h1>;
 
   return (
     <>
-    <Canvas>
-      <ErrorBoundary>
-        {scene && (
-          <>
-            <Environment environment={scene.environment} />
-            <ElementsTree elements={scene.elements} />
-          </>
-        )}
-        <Controls />
-      </ErrorBoundary>
-    </Canvas>
-    {canModify && <Modifications update={updateModification} applied={appliedModification} modifications={scene?.availableMods}/>
-  </>
+      <Canvas>
+        <ErrorBoundary>
+          {scene && (
+            <>
+              <Environment environment={sceneWithMods.environment} />
+              <ElementsTree elements={sceneWithMods.elements} />
+            </>
+          )}
+          <Controls />
+        </ErrorBoundary>
+      </Canvas>
+      {canModify && (
+        <ModificationControls
+          toggleApplied={toggleApplied}
+          applied={appliedModification}
+          modifications={scene?.availableMods}
+        />
+      )}
+    </>
   );
 };
 

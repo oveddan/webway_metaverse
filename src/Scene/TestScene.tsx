@@ -25,7 +25,7 @@ const TestScene = () => {
 
   if (!scene) return <h1>Invalid scene id</h1>;
 
-  return <SceneRenderer loading={false} valid scene={scene} />;
+  return <SceneRenderer loading={false} valid scene={scene} canModify />;
 };
 
 export default TestScene;

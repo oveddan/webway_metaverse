@@ -42,3 +42,7 @@ export type Modification =
   | AddElementModification
   | RemoveElementModification
   | UpdateEnvironmentModification;
+
+export type AvailableModifications = {
+  [key: string]: Modification;
+};
