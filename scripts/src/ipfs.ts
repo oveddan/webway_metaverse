@@ -40,7 +40,7 @@ const pinata: Options = {
   },
 };
 
-const ipfs = create(pinata);
+const ipfs = create(infura);
 
 const ipfsGateway = "https://ipfs.io/ipfs/";
 // const pinataGateway = 'https://landa.mypinata.cloud';
