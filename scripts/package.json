@@ -1,0 +1,18 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "create_contracts.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "temp": "^0.9.4",
+    "temp-file": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/temp": "^0.9.1"
+  }
+}
