@@ -11,11 +11,11 @@ import { Water2Options } from "three-stdlib";
 // @ts-ignore
 import { Water } from "three/examples/jsm/objects/Water2";
 import { WaterConfig } from "../Config/types/elements";
-import { convertURIToHTTPS } from "../lib/ipfs";
+import { convertURIToHTTPS, toIpfsUrl } from "../lib/ipfs";
 
-const toIpfsUrl = (cid: string) => `ipfs.io/${cid}`;
 
-const toUrlFromIpfs = (cid: string) => convertURIToHTTPS({url:toIpfsUrl(cid)});
+const toUrlFromIpfs = (cid: string) =>
+  convertURIToHTTPS({ url: toIpfsUrl(cid) });
 
 const getWaterNormalUrls = () => {
   return [
@@ -72,7 +72,11 @@ const WaterInner = ({
 
   if (!water2) return null;
 
-  return <group rotation-x={-Math.PI/2}><primitive object={water2} /></group>;
+  return (
+    <group rotation-x={-Math.PI / 2}>
+      <primitive object={water2} />
+    </group>
+  );
 };
 
 const WaterElement = ({ config }: { config: WaterConfig }) => {

@@ -21,7 +21,7 @@ export type Transform = {
 export type BaseElement = {
   transform?: Nullable<Transform>;
   elementType: ElementType;
-  children?: Nullable<Element[]>;
+  children?: Nullable<ElementNodes>;
 };
 
 export type ModelElement = BaseElement & {
@@ -40,6 +40,10 @@ export type WaterElement = BaseElement & {
 };
 
 export type Element = ModelElement | ImageElement | WaterElement;
+
+export type ElementNodes = {
+  [id: string]: Element;
+};
 
 export type ModelConfig = {
   fileUrl?: Nullable<string>;

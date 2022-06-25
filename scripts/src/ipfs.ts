@@ -9,7 +9,11 @@ import {
 import chalk from "chalk";
 import { clearLine } from "readline";
 import { SceneConfiguration } from "../../src/Scene/Config/types/scene";
-import { Element, ElementType } from "../../src/Scene/Config/types/elements";
+import {
+  Element,
+  ElementNodes,
+  ElementType,
+} from "../../src/Scene/Config/types/elements";
 import marbleScene from "../../src/Scene/Config/marbleScene";
 import temp from "temp";
 import http from "https"; // or 'https' for https:// URLs
@@ -40,7 +44,7 @@ const pinata: Options = {
   },
 };
 
-const ipfs = create(infura);
+const ipfs = create(localhost);
 
 const ipfsGateway = "https://ipfs.io/ipfs/";
 // const pinataGateway = 'https://landa.mypinata.cloud';
@@ -82,9 +86,9 @@ const publishFile = async (url: string) => {
   return toIpfsAddress(result.cid);
 };
 
-const publishElementsToIps = async (elements: Element[]) => {
+const publishElementsToIps = async (elements: ElementNodes) => {
   const result = await Promise.all(
-    elements.map(async (element) => {
+    Object.entries(elements).map(async ([key, element]) => {
       const children = element.children
         ? await publishElementsToIps(element.children)
         : undefined;
@@ -102,13 +106,21 @@ const publishElementsToIps = async (elements: Element[]) => {
       }
 
       return {
-        ...element,
-        children,
+        key,
+        element: {
+          ...element,
+          children,
+        },
       };
     })
   );
 
-  return result;
+  return result.reduce((acc: ElementNodes, { key, element }) => {
+    return {
+      ...acc,
+      [key]: element,
+    };
+  }, {});
 };
 
 const publishFilesInGraphToIpfs = async (
@@ -123,6 +135,7 @@ const publishFilesInGraphToIpfs = async (
     elements: config.elements
       ? await publishElementsToIps(config.elements)
       : undefined,
+    availableMods: config.availableMods
   };
 };
 
@@ -233,7 +246,7 @@ const publishNft = async ({
   const tokenIpfsCif = await ipfs.add(JSON.stringify(tokenMetadata, null, 2));
 
   const tokenIpfsCifUrl = toIpfsAddress(tokenIpfsCif.cid);
-  console.log(tokenIpfsCifUrl);
+  console.log('published to:', tokenIpfsCifUrl);
 };
 
 publishNft({

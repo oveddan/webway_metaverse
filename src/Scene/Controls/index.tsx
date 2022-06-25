@@ -4,7 +4,7 @@ const Controls = () => {
   return (
     <>
       <PointerLockControls />
-      <FlyControls movementSpeed={3}/>
+      <FlyControls movementSpeed={3} />
     </>
   );
 };

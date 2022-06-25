@@ -47,3 +47,6 @@ export const useHttpsUriForIpfs = (ipfsUrl?: Nullable<string>) => {
 
   return result;
 };
+
+
+export const toIpfsUrl = (cid: string) => `ipfs.io/${cid}`;
