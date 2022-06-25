@@ -2,28 +2,21 @@ import { Canvas } from "@react-three/fiber";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ErrorBoundary from "../shared/ErrorBoundary";
-import marbleScene from "./Config/marbleScene";
-import { SceneConfiguration } from "./Config/types/scene";
 import Controls from "./Controls";
 import ElementsTree from "./Elements/ElementsTree";
 import Environment from "./Elements/Environment";
-
-function useSceneConfig(tokenId: string) {
-  const [scene, setScene] = useState<SceneConfiguration>();
-
-  useEffect(() => {
-    setScene(marbleScene);
-  }, [tokenId]);
-
-  return scene;
-}
+import { useTokenScene } from "./lib/queries";
 
 const Root = () => {
   const { tokenId } = useParams<{
     tokenId: string;
   }>();
 
-  const sceneConfig = useSceneConfig(tokenId);
+  const { loading, scene: sceneConfig, valid } = useTokenScene(tokenId);
+
+  if (loading) return <h1>loading...</h1>;
+
+  if (!valid) return <h1>Invalid token id</h1>;
 
   return (
     <Canvas>

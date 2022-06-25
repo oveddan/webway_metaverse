@@ -3,6 +3,7 @@ import {
   create,
   globSource,
   IPFSHTTPClient,
+  Options,
   urlSource,
 } from "ipfs-http-client";
 import chalk from "chalk";
@@ -29,9 +30,20 @@ const infura = { host: "ipfs.infura.io", port: 5001, protocol: "https" };
 // run your own ipfs daemon: https://docs.ipfs.io/how-to/command-line-quick-start/#install-ipfs
 const localhost = { host: "127.0.0.1", port: 5002, protocol: "http" };
 
-const ipfs = create(infura);
+const pinata: Options = {
+  host: "api.pinata.cloud",
+  apiPath: "psa",
+  port: 443,
+  protocol: "https",
+  headers: {
+    Authorization: `Bearer ${process.env.PINATA_JWT}`,
+  },
+};
+
+const ipfs = create(pinata);
 
 const ipfsGateway = "https://ipfs.io/ipfs/";
+// const pinataGateway = 'https://landa.mypinata.cloud';
 const ipnsGateway = "https://ipfs.io/ipns/";
 
 const addOptions = {
@@ -58,7 +70,7 @@ const downloadTempFile = async (remoteUrl: string) => {
   });
 };
 
-const toIpfsAddress = (cid: CID) => `ipfs.io/${cid.toString()}`
+const toIpfsAddress = (cid: CID) => `ipfs.io/${cid.toString()}`;
 
 const publishFile = async (url: string) => {
   console.log("publishing file", url);
@@ -69,8 +81,6 @@ const publishFile = async (url: string) => {
 
   return toIpfsAddress(result.cid);
 };
-
-
 
 const publishElementsToIps = async (elements: Element[]) => {
   const result = await Promise.all(
@@ -198,23 +208,26 @@ export const deploy = async () => {
   return true;
 };
 
-interface Erc721Token {
+export interface Erc721Token {
   name: string;
   description?: string;
   animation_url: string;
   scene_config: SceneConfiguration;
 }
 
-const publishNft = async ({name, sceneConfig}:{
-  name: string,
-  sceneConfig: SceneConfiguration
+const publishNft = async ({
+  name,
+  sceneConfig,
+}: {
+  name: string;
+  sceneConfig: SceneConfiguration;
 }) => {
   const configJson = await publishFilesInGraphToIpfs(sceneConfig);
 
   const tokenMetadata: Erc721Token = {
     name,
     animation_url: "",
-    scene_config: configJson
+    scene_config: configJson,
   };
 
   const tokenIpfsCif = await ipfs.add(JSON.stringify(tokenMetadata, null, 2));

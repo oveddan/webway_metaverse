@@ -1,41 +1,17 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
-const useScenes = () => {
-  const [scenes, setScenes] = useState<
-    {
-      tokenId: string;
-      name: string;
-    }[]
-  >();
-
-  useEffect(() => {
-    setScenes([
-      {
-        name: "sceneA",
-        tokenId: "asdfasfda",
-      },
-      {
-        name: "sceneB",
-        tokenId: "asdfasdfasdfasdfasdfas",
-      },
-    ]);
-  }, []);
-
-  return scenes;
-};
+import { useTokens } from "./lib/queries";
 
 const ScenesList = () => {
-  const scenes = useScenes();
+  const { loading, tokens: scenes } = useTokens();
 
-  if (!scenes) return null;
+  if (loading) return null;
 
   return (
     <ul>
       {scenes.map((scene) => (
-        <li key={scene.tokenId}>
-          <Link to={`/${scene.tokenId}`} className="underline">
-            {scene.name}
+        <li key={scene.id}>
+          <Link to={`/${scene.id}`} className="underline">
+            {scene.id}
           </Link>
         </li>
       ))}

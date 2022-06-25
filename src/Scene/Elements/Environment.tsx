@@ -1,14 +1,15 @@
 import { SceneConfiguration } from "../Config/types/scene";
 import { Environment as DreiEnvironment } from "@react-three/drei";
+import { useHttpsUriForIpfs } from "../lib/ipfs";
 
 const Environment = ({
   environment,
 }: Pick<SceneConfiguration, "environment">) => {
-  if (!environment) return null;
+  const fileUrl = useHttpsUriForIpfs(environment?.fileUrl);
 
-  if (!environment.fileUrl || !environment.fileUrl) return null;
+  if (!fileUrl) return null;
 
-  return <DreiEnvironment files={environment.fileUrl} background />;
+  return <DreiEnvironment files={fileUrl} background />;
 };
 
 export default Environment;

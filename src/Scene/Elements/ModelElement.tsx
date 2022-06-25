@@ -1,6 +1,7 @@
 import { ModelConfig } from "../Config/types/elements";
 import { Nullable } from "../Config/types/shared";
 import { useGLTF } from "@react-three/drei";
+import { useHttpsUriForIpfs } from "../lib/ipfs";
 
 const ModelElementInner = ({ fileUrl }: { fileUrl: string }) => {
   const model = useGLTF(fileUrl, true);
@@ -9,11 +10,11 @@ const ModelElementInner = ({ fileUrl }: { fileUrl: string }) => {
 };
 
 const ModelElement = ({ config }: { config?: Nullable<ModelConfig> }) => {
-  if (!config) return null;
+  const fileUrl = useHttpsUriForIpfs(config?.fileUrl);
 
-  if (!config.fileUrl) return null;
+  if (!fileUrl) return null;
 
-  return <ModelElementInner fileUrl={config.fileUrl} />;
+  return <ModelElementInner fileUrl={fileUrl} />;
 };
 
 export default ModelElement;
