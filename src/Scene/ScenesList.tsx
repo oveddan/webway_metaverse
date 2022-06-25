@@ -11,7 +11,7 @@ const ScenesList = () => {
       {scenes.map((scene) => (
         <li key={scene.id}>
           <Link to={`/${scene.id}`} className="underline">
-            {scene.id}
+            Scene at Token {scene.id}
           </Link>
         </li>
       ))}
