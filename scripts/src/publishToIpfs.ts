@@ -97,13 +97,16 @@ const publishElementsToIps = async (elements: ElementNodes) => {
         : undefined;
       if (element.elementType === ElementType.Model) {
         return {
-          ...element,
-          children,
-          modelConfig: {
-            ...element.modelConfig,
-            fileUrl: element.modelConfig.fileUrl
-              ? await publishFile(element.modelConfig.fileUrl)
-              : undefined,
+          key,
+          element: {
+            ...element,
+            children,
+            modelConfig: {
+              ...element.modelConfig,
+              fileUrl: element.modelConfig.fileUrl
+                ? await publishFile(element.modelConfig.fileUrl)
+                : undefined,
+            },
           },
         };
       }
@@ -111,13 +114,16 @@ const publishElementsToIps = async (elements: ElementNodes) => {
       if (element.elementType === ElementType.Image) {
         const { imageConfig } = element;
         return {
-          ...element,
-          children,
-          imageConfig: {
-            ...imageConfig,
-            fileUrl: imageConfig.fileUrl
-              ? await publishFile(imageConfig.fileUrl)
-              : undefined,
+          key,
+          element: {
+            ...element,
+            children,
+            imageConfig: {
+              ...imageConfig,
+              fileUrl: imageConfig.fileUrl
+                ? await publishFile(imageConfig.fileUrl)
+                : undefined,
+            },
           },
         };
       }
@@ -125,14 +131,17 @@ const publishElementsToIps = async (elements: ElementNodes) => {
       if (element.elementType === ElementType.Video) {
         const { videoConfig } = element;
         return {
-          ...element,
-          children,
-          videoConfig: {
-            ...videoConfig,
-            file: {
-              originalUrl: videoConfig?.file?.originalUrl
-                ? await publishFile(videoConfig.file.originalUrl)
-                : undefined,
+          key,
+          element: {
+            ...element,
+            children,
+            videoConfig: {
+              ...videoConfig,
+              file: {
+                originalUrl: videoConfig?.file?.originalUrl
+                  ? await publishFile(videoConfig.file.originalUrl)
+                  : undefined,
+              },
             },
           },
         };
@@ -267,6 +276,11 @@ const publishToken = async ({
   sceneConfig: SceneConfiguration;
 }) => {
   const configJson = await publishFilesInGraphToIpfs(sceneConfig);
+
+  console.log({
+    configJson,
+    sceneConfig,
+  });
 
   const tokenMetadata: Erc721Token = {
     name,

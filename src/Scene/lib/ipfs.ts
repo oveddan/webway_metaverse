@@ -6,7 +6,7 @@ const localStorageGateway = "http://127.0.0.1:8080/ipfs";
 const ipfsGateway = "https://ipfs.io/ipfs";
 function convertURIToHTTPSInner({
   url,
-  ipfsHost = localStorageGateway,
+  ipfsHost = nftStorageGateway ,
 }: {
   url: string | undefined;
   ipfsHost?: string;
