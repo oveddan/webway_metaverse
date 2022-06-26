@@ -17,11 +17,22 @@ export type TokenUri = {
   uri: string;
 };
 
+const OWNERS_QUERY = `
+{
+  owners {
+    id
+  }
+}
+`;
+
+const OWNERS_GQL = gql(OWNERS_QUERY);
+
 export type TokenQueryData = { tokenURIs: TokenUri[] };
+export type OwnersQueryData = { owners: {id: string }[]};
+
+const TOKEN_GQL = gql(TOKEN_URIS_QUERY);
 
 export const useTokens = () => {
-  const TOKEN_GQL = gql(TOKEN_URIS_QUERY);
-
   const { loading, data: dataToken } = useQuery<TokenQueryData>(TOKEN_GQL, {
     pollInterval: 2500,
   });
@@ -58,11 +69,6 @@ export const useTokenScene = (tokenId: string) => {
 
     if (loading) return;
 
-    console.log({
-      tokens,
-      tokenId,
-    });
-
     const tokenForId = tokens.find(({ id }) => id === tokenId);
 
     if (!tokenForId) {
@@ -87,4 +93,35 @@ export const useTokenScene = (tokenId: string) => {
   }, [tokenId, tokens, loading]);
 
   return scene;
+};
+
+export const useOwner = (tokenId?: string) => {
+  const { loading: loadingOwners, data: dataOwners } =
+    useQuery<OwnersQueryData>(OWNERS_GQL, { pollInterval: 10000 });
+
+  const [owner, setOwner] = useState<string>();
+
+  useEffect(() => {
+    if (loadingOwners || !tokenId) {
+      setOwner(undefined);
+      return;
+    }
+
+    console.log(dataOwners);
+
+    const parsedOwners = dataOwners?.owners?.map((result) => {
+      const [owner, id] = result.id.split(" ");
+      return {owner, id};
+    });
+      
+    const tokenOwner = parsedOwners?.find(({id}) => id === tokenId)?.owner;
+
+    if (tokenOwner) {
+      setOwner(tokenOwner);
+    } else {
+      setOwner(undefined);
+    }
+  }, [loadingOwners, dataOwners, tokenId]);
+
+  return owner;
 };

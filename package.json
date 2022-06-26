@@ -39,7 +39,7 @@
     "bnc-notify": "^1.5.0",
     "dotenv": "^8.2.0",
     "eth-hooks": "2.3.16",
-    "ethers": "^5.4.1",
+    "ethers": "^5.6.9",
     "fortmatic": "^2.2.1",
     "graphiql": "^1.4.7",
     "graphql": "^15.3.0",
@@ -59,6 +59,7 @@
     "three": "^0.141.0",
     "ts-node": "~10.7.0",
     "typescript": "~4.6.4",
+    "wagmi": "^0.4.12",
     "walletlink": "^2.1.5",
     "web3modal": "^1.9.1"
   },

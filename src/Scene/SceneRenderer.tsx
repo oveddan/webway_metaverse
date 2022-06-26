@@ -15,12 +15,14 @@ const SceneRenderer = ({
   loading,
   valid,
   scene,
-  canModify,
+  canAlwaysModify,
+  tokenId,
 }: {
   loading: boolean;
   valid?: boolean;
   scene?: SceneConfiguration;
-  canModify?: boolean;
+  canAlwaysModify?: boolean;
+  tokenId?: string;
 }) => {
   const [appliedModification, setAppliedModifications] =
     useState<AppliedModifications>({});
@@ -72,13 +74,13 @@ const SceneRenderer = ({
           <Controls />
         </ErrorBoundary>
       </Canvas>
-      {canModify && (
-        <ModificationControls
-          toggleApplied={toggleApplied}
-          applied={appliedModification}
-          modifications={scene?.availableMods}
-        />
-      )}
+      <ModificationControls
+        toggleApplied={toggleApplied}
+        applied={appliedModification}
+        modifications={scene?.availableMods}
+        canAlwaysModify={canAlwaysModify}
+        tokenId={tokenId}
+      />
     </>
   );
 };

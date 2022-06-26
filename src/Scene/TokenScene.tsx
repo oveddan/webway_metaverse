@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import Profile from "../web3/Profile";
 import { useTokenScene } from "./lib/queries";
 import SceneRenderer from "./SceneRenderer";
 
@@ -9,7 +10,12 @@ const TokenScene = () => {
 
   const tokenScene = useTokenScene(tokenId);
 
-  return <SceneRenderer {...tokenScene} />;
+  return (
+    <>
+      <Profile />
+      <SceneRenderer {...tokenScene} tokenId={tokenId} />
+    </>
+  );
 };
 
 export default TokenScene;

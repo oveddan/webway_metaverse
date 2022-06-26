@@ -1,5 +1,5 @@
 import { ElementNodes } from "./elements";
-import { Modification } from "./modifications";
+import { AvailableModifications, Modification } from "./modifications";
 import { Nullable } from "./shared";
 
 export enum EnvironmentFileType {
@@ -14,7 +14,5 @@ export type EnvironmentConfig = {
 export type SceneConfiguration = {
   elements?: Nullable<ElementNodes>;
   environment?: Nullable<EnvironmentConfig>;
-  availableMods: {
-    [key: string]: Modification;
-  };
+  availableMods: AvailableModifications;
 };
