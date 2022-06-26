@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Erc721Token } from "../Config/token";
+import { Modification } from "../Config/types/modifications";
 import { SceneConfiguration } from "../Config/types/scene";
 
 const TOKEN_URIS_QUERY = `
@@ -25,13 +26,10 @@ const OWNERS_QUERY = `
 }
 `;
 
-
 const ACTIVE_EFFECTS_QUERY = `
 {
   activeEffects {
-    id
-    type
-    uri
+    active
   }
 }
 `;
@@ -42,8 +40,7 @@ const ACTIVE_GQL = gql(ACTIVE_EFFECTS_QUERY);
 
 export type TokenQueryData = { tokenURIs: TokenUri[] };
 export type OwnersQueryData = { owners: { id: string }[] };
-export type ActiveEffectsQueryData = {  };
-
+export type ActiveEffectsQueryData = {};
 
 export const useTokens = () => {
   const { loading, data: dataToken } = useQuery<TokenQueryData>(TOKEN_GQL, {
@@ -120,8 +117,6 @@ export const useOwner = (tokenId?: string) => {
       return;
     }
 
-    console.log(dataOwners);
-
     const parsedOwners = dataOwners?.owners?.map((result) => {
       const [owner, id] = result.id.split(" ");
       return { owner, id };
@@ -139,33 +134,61 @@ export const useOwner = (tokenId?: string) => {
   return owner;
 };
 
+type ActiveEffects = {
+  [key: string]: {
+    modification: Modification;
+    name: string;
+    active: boolean;
+  };
+};
+
+type ActiveEffectsQueryResult = {
+  name: string;
+  uri: string;
+  active: boolean;
+  id: string;
+}[];
 
 export const useActiveEffects = (tokenId?: string) => {
-  const { loading: loadingActive, data: dataActive } = useQuery(ACTIVE_GQL, { pollInterval: 2500 });
+  const { loading: loadingActive, data: dataActive } = useQuery<{
+    activeEffects: ActiveEffectsQueryResult;
+  }>(ACTIVE_GQL, { pollInterval: 2500 });
 
-  const [owner, setOwner] = useState<string>();
+  const [effects, setEffects] = useState<ActiveEffects>();
 
   useEffect(() => {
-    if (loadingActive|| !tokenId) {
-      setOwner(undefined);
+    if (loadingActive || !tokenId) {
+      setEffects({});
       return;
     }
 
-    console.log(dataActive);
+    if (!dataActive) return;
 
-    // const parsedOwners = dataOwners?.owners?.map((result) => {
-    //   const [owner, id] = result.id.split(" ");
-    //   return { owner, id };
-    // });
+    (async () => {
+      const parsedEffects = await Promise.all(
+        dataActive.activeEffects.map(async (effect) => {
+          const modification = (await (
+            await fetch(effect.uri)
+          ).json()) as Modification;
+          return {
+            active: effect.active,
+            modification,
+            name: effect.name,
+            id: effect.id,
+          };
+        })
+      );
 
-    // const tokenOwner = parsedOwners?.find(({ id }) => id === tokenId)?.owner;
+      const reduced = parsedEffects.reduce((x: ActiveEffects, effect) => {
+        return {
+          ...x,
+          [effect.id]: effect,
+        };
+      }, {});
 
-    // if (tokenOwner) {
-    //   setOwner(tokenOwner);
-    // } else {
-    //   setOwner(undefined);
-    // }
+      setEffects(reduced);
+    })();
   }, [loadingActive, dataActive, tokenId]);
 
-  return owner;
+  return effects;
 };

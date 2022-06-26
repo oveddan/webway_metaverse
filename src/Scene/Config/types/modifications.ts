@@ -46,3 +46,20 @@ export type Modification =
 export type AvailableModifications = {
   [key: string]: Modification;
 };
+
+export type AppliedModification = {
+  applied: boolean;
+  processing: boolean;
+  error: boolean;
+};
+
+export type AppliedModifications = {
+  [key: string]: AppliedModification;
+};
+
+export type ModificationsWithStatus = {
+  [key: string]: {
+    modification: Modification;
+    applied?: AppliedModification;
+  };
+};

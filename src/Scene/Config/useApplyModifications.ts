@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { AppliedModifications } from "../../UI/ModificationControls";
 import { SceneConfiguration } from "./types/scene";
 import { Element, ElementNodes } from "./types/elements";
-import { cloneDeep, result, update } from "lodash";
+import { cloneDeep, update } from "lodash";
 import {
-  AvailableModifications,
+  ModificationsWithStatus,
   ModificationType,
 } from "./types/modifications";
 import { Nullable } from "./types/shared";
@@ -25,12 +24,10 @@ const findElement = (
 
 const useApplyModifications = ({
   scene,
-  appliedModifications,
-  availableMods,
+  modifications,
 }: {
   scene?: SceneConfiguration;
-  availableMods?: AvailableModifications;
-  appliedModifications: AppliedModifications;
+  modifications: ModificationsWithStatus;
 }) => {
   const [sceneWithMods, setSceneWithMods] =
     useState<Pick<SceneConfiguration, "elements" | "environment">>();
@@ -44,11 +41,10 @@ const useApplyModifications = ({
 
     const elements = cloneDeep(scene?.elements);
 
-    Object.entries(appliedModifications).forEach(
-      ([key, appliedModification]) => {
-        if (!availableMods) return;
-        if (!appliedModification.applied) return;
-        const modification = availableMods[key];
+    Object.entries(modifications).forEach(
+      ([key, { applied, modification }]) => {
+        if (!applied) return;
+        if (!applied.applied) return;
         if (!modification) return;
 
         if (modification.modificationType === ModificationType.UpdateElement) {
@@ -73,7 +69,7 @@ const useApplyModifications = ({
       elements,
       environment: resultEnvironment,
     });
-  }, [scene, appliedModifications]);
+  }, [scene, modifications]);
 
   return sceneWithMods;
 };

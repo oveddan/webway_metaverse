@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useContractWrite, useProvider } from "wagmi";
 
 import deployedContracts from "./contracts/hardhat_contracts.json";
@@ -18,7 +18,13 @@ export const useAddEffectContract = () => {
 
 export const useToggleEffectContract = () => {
   const provider = useProvider();
-  const { data, isError, isLoading, write } = useContractWrite(
+  const [applied, setApplied] = useState<{
+    [effectId: string]: {
+      processing: boolean;
+      error?: boolean;
+    };
+  }>({});
+  const { data, isError, isLoading, writeAsync } = useContractWrite(
     {
       addressOrName: "0xecb504d39723b0be0e3a9aa33d646642d1051ee1",
       contractInterface:
@@ -29,12 +35,37 @@ export const useToggleEffectContract = () => {
   );
 
   const toggleEffect = useCallback(
-    (name: string) => {
-      write({
-        args: [name],
-      });
+    async (effectId: string) => {
+      if (applied[effectId].processing) return;
+      setApplied((existing) => ({
+        ...existing,
+        [effectId]: {
+          processing: true,
+        },
+      }));
+
+      try {
+        await writeAsync({
+          args: [effectId],
+        });
+      } catch (e) {
+        setApplied((existing) => ({
+          ...existing,
+          [effectId]: {
+            error: true,
+            processing: false,
+          },
+        }));
+        return;
+      }
+      setApplied((existing) => ({
+        ...existing,
+        [effectId]: {
+          processing: false,
+        },
+      }));
     },
-    [write]
+    [applied]
   );
 
   return toggleEffect;

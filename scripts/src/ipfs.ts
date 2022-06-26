@@ -230,11 +230,14 @@ export interface Erc721Token {
   scene_config: SceneConfiguration;
 }
 
-const publishToken = async ({name, sceneConfig}:{
-  name: string,
-  sceneConfig: SceneConfiguration
+const publishToken = async ({
+  name,
+  sceneConfig,
+}: {
+  name: string;
+  sceneConfig: SceneConfiguration;
 }) => {
-const configJson = await publishFilesInGraphToIpfs(sceneConfig);
+  const configJson = await publishFilesInGraphToIpfs(sceneConfig);
 
   const tokenMetadata: Erc721Token = {
     name,
@@ -246,8 +249,7 @@ const configJson = await publishFilesInGraphToIpfs(sceneConfig);
 
   const tokenIpfsCifUrl = toIpfsAddress(tokenIpfsCif.cid);
   console.log("token ipfs address:", tokenIpfsCifUrl);
-
-}
+};
 
 const publishNft = async ({
   name,
@@ -259,7 +261,7 @@ const publishNft = async ({
   availableMods: AvailableModifications;
 }) => {
   // await publishToken({name, sceneConfig});
-  
+
   await Promise.all(
     Object.entries(availableMods).map(async ([key, mod]) => {
       const modIpfsCid = await ipfs.add(JSON.stringify(mod, null, 2));

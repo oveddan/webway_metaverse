@@ -1,6 +1,10 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import marbleScene, { marbleSceneMods } from "./Config/marbleScene";
+import {
+  AppliedModifications,
+  ModificationsWithStatus,
+} from "./Config/types/modifications";
 import SceneRenderer from "./SceneRenderer";
 
 function useQuery() {
@@ -13,8 +17,56 @@ const testScenes = {
   marble: marbleScene,
 };
 
+const availableModifications = marbleSceneMods;
+
 const TestScene = () => {
   const query = useQuery();
+
+  const [appliedModification, setAppliedModifications] =
+    useState<AppliedModifications>({});
+
+  const toggleApplied = useCallback((key: string) => {
+    setAppliedModifications((existing) => {
+      const existingApplied = existing[key];
+
+      if (existingApplied?.processing) return existing;
+
+      const updated = {
+        ...existing,
+        [key]: {
+          applied: !existingApplied?.applied,
+          processing: false,
+          error: false,
+        },
+      };
+
+      console.log(
+        "updating",
+
+        { checked: !existingApplied?.applied, key, update: updated[key] }
+      );
+
+      return updated;
+    });
+  }, []);
+
+  const [modificationsWithStatus, setModificationsWithStatus] =
+    useState<ModificationsWithStatus>({});
+
+  useEffect(() => {
+    const combined = Object.entries(availableModifications).reduce(
+      (acc: ModificationsWithStatus, [key, mod]) => {
+        acc[key] = {
+          applied: appliedModification[key],
+          modification: mod,
+        };
+        return acc;
+      },
+      {}
+    );
+
+    setModificationsWithStatus(combined);
+  }, [appliedModification, availableModifications]);
 
   const sceneParam = query.get("scene");
 
@@ -30,7 +82,8 @@ const TestScene = () => {
       loading={false}
       valid
       scene={scene}
-      availableModifications={marbleSceneMods}
+      modifications={modificationsWithStatus}
+      toggleApplied={toggleApplied}
       canAlwaysModify
     />
   );

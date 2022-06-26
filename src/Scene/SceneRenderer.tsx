@@ -5,12 +5,12 @@ import ElementsTree from "./Elements/ElementsTree";
 import Environment from "./Elements/Environment";
 
 import { SceneConfiguration } from "./Config/types/scene";
-import { useCallback, useEffect, useState } from "react";
-import ModificationControls, {
-  AppliedModifications,
-} from "../UI/ModificationControls";
+import ModificationControls from "../UI/ModificationControls";
 import useApplyModifications from "./Config/useApplyModifications";
-import { AvailableModifications } from "./Config/types/modifications";
+import {
+  AvailableModifications,
+  ModificationsWithStatus,
+} from "./Config/types/modifications";
 
 const SceneRenderer = ({
   loading,
@@ -18,46 +18,20 @@ const SceneRenderer = ({
   scene,
   canAlwaysModify,
   tokenId,
-  availableModifications,
+  toggleApplied,
+  modifications,
 }: {
   loading: boolean;
   valid?: boolean;
   scene?: SceneConfiguration;
-  availableModifications?: AvailableModifications;
+  modifications: ModificationsWithStatus;
+  toggleApplied: (key: string) => void;
   canAlwaysModify?: boolean;
   tokenId?: string;
 }) => {
-  const [appliedModification, setAppliedModifications] =
-    useState<AppliedModifications>({});
-
-  const toggleApplied = useCallback((key: string) => {
-    setAppliedModifications((existing) => {
-      const existingApplied = existing[key];
-
-      if (existingApplied?.processing) return existing;
-
-      const updated = {
-        ...existing,
-        [key]: {
-          applied: !existingApplied?.applied,
-          processing: false,
-          error: false,
-        },
-      };
-
-      console.log(
-        "updating",
-
-        { checked: !existingApplied?.applied, key, update: updated[key] }
-      );
-
-      return updated;
-    });
-  }, []);
-
   const sceneWithMods = useApplyModifications({
     scene,
-    appliedModifications: appliedModification,
+    modifications,
   });
 
   if (loading || !sceneWithMods) return <h1>loading...</h1>;
@@ -79,8 +53,7 @@ const SceneRenderer = ({
       </Canvas>
       <ModificationControls
         toggleApplied={toggleApplied}
-        applied={appliedModification}
-        modifications={availableModifications}
+        modifications={modifications}
         canAlwaysModify={canAlwaysModify}
         tokenId={tokenId}
       />
