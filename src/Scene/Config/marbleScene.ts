@@ -29,24 +29,46 @@ const marbleScene: SceneConfiguration = {
         scale: 10,
       },
     },
-  image: {
-    elementType: ElementType.Image,
-    imageConfig: {
-      fileUrl: 'https://firebasestorage.googleapis.com/v0/b/mintxr-experiment.appspot.com/o/oiltimercolored_hu86ad23eb56ff66ff007b5a426357b158_7375980_700x0_resize_box_2.png?alt=media&token=d311f24a-6257-460c-ab32-413859fb75d4'
-    },
-    transform: {
-      position: {
-        y: 5,
-        z: -33,
-        x: 0
+    image: {
+      elementType: ElementType.Image,
+      imageConfig: {
+        fileUrl:
+          "https://firebasestorage.googleapis.com/v0/b/mintxr-experiment.appspot.com/o/oiltimercolored_hu86ad23eb56ff66ff007b5a426357b158_7375980_700x0_resize_box_2.png?alt=media&token=d311f24a-6257-460c-ab32-413859fb75d4",
       },
-      scale: {
-        x: 5,
-        y: 5,
-        z: 5
-      }
-    }
-  }
+      transform: {
+        position: {
+          y: 5,
+          z: -33,
+          x: 0,
+        },
+        scale: {
+          x: 5,
+          y: 5,
+          z: 5,
+        },
+      },
+    },
+    video: {
+      elementType: ElementType.Video,
+      videoConfig: {
+        file: {
+          originalUrl:
+            "https://firebasestorage.googleapis.com/v0/b/mintxr-experiment.appspot.com/o/MelodicThenRythm_2.mp4?alt=media&token=1453b8ea-1e30-4ded-9b6d-809423c45bb6",
+        },
+      },
+      transform: {
+        position: {
+          y: 5.5,
+          z: 33,
+          x: 0,
+        },
+        scale: {
+          x: 6,
+          y: 6,
+          z: 6,
+        },
+      },
+    },
   },
 };
 export const marbleSceneMods: AvailableModifications = {

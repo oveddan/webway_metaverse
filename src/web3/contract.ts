@@ -61,5 +61,5 @@ export const useToggleEffectContract = () => {
     [applied, writeAsync]
   );
 
-  return {toggleEffect, applied};
+  return { toggleEffect, applied };
 };

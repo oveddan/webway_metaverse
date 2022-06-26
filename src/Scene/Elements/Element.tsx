@@ -6,6 +6,7 @@ import ModelElement from "./ModelElement";
 import ElementsTree from "./ElementsTree";
 import WaterElement from "./WaterElement";
 import ImageElement from "./ImageElement";
+import VideoElement from "./VideoElement";
 
 const useTransform = (transform?: Nullable<Transform>) => {
   const [convertedTrasnform, setTransform] = useState<{
@@ -42,7 +43,7 @@ const useTransform = (transform?: Nullable<Transform>) => {
 };
 
 const ElementComponent = ({ config }: { config: Element }) => {
-  const transform = config.transform
+  const transform = config.transform;
 
   return (
     <group
@@ -69,6 +70,10 @@ const ElementComponent = ({ config }: { config: Element }) => {
 
       {config.elementType === ElementType.Image && (
         <ImageElement config={config.imageConfig} />
+      )}
+
+      {config.elementType === ElementType.Video && (
+        <VideoElement config={config.videoConfig} />
       )}
 
       <ElementsTree elements={config.children} />

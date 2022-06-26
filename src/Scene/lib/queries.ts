@@ -27,7 +27,7 @@ const OWNERS_QUERY = `
 }
 `;
 
-const activeEffectsQuery = (tokenId: string)=> gql`
+const activeEffectsQuery = (tokenId: string) => gql`
 {
   activeEffects(where: {tokenId: "${tokenId}"}) {
     uri,
@@ -155,7 +155,7 @@ export const useActiveEffects = (tokenId?: string) => {
   const query = useMemo(() => activeEffectsQuery(tokenId), [tokenId]);
   const { loading: loadingActive, data: dataActive } = useQuery<{
     activeEffects: ActiveEffectsQueryResult;
-  // @ts-ignore
+    // @ts-ignore
   }>(query, { pollInterval: 2500 });
 
   const [effects, setEffects] = useState<ActiveEffects>();
@@ -171,11 +171,9 @@ export const useActiveEffects = (tokenId?: string) => {
     (async () => {
       const parsedEffects = await Promise.all(
         dataActive.activeEffects.map(async (effect) => {
-          const toFetch = convertURIToHTTPS({url:effect.uri});
+          const toFetch = convertURIToHTTPS({ url: effect.uri });
           const data = await fetch(toFetch);
-          const modification = (await (
-           data 
-          ).json()) as Modification;
+          const modification = (await data.json()) as Modification;
           return {
             active: effect.active,
             modification,

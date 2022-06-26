@@ -7,10 +7,9 @@ import Environment from "./Elements/Environment";
 import { SceneConfiguration } from "./Config/types/scene";
 import ModificationControls from "../UI/ModificationControls";
 import useApplyModifications from "./Config/useApplyModifications";
-import {
-  AvailableModifications,
-  ModificationsWithStatus,
-} from "./Config/types/modifications";
+import { ModificationsWithStatus } from "./Config/types/modifications";
+import { useCallback, useState } from "react";
+import { SceneContext } from "./SceneContext";
 
 const SceneRenderer = ({
   loading,
@@ -34,22 +33,31 @@ const SceneRenderer = ({
     modifications,
   });
 
+  const [hasClicked, setHasClicked] = useState(false);
+
+  const onClicked = useCallback(() => {
+    if (hasClicked) return;
+    setHasClicked(true);
+  }, [hasClicked]);
+
   if (loading || !sceneWithMods) return <h1>loading...</h1>;
 
   if (!valid) return <h1>Invalid token id</h1>;
 
   return (
     <>
-      <Canvas>
-        <ErrorBoundary>
-          {scene && (
-            <>
-              <Environment environment={sceneWithMods.environment} />
-              <ElementsTree elements={sceneWithMods.elements} />
-            </>
-          )}
-          <Controls />
-        </ErrorBoundary>
+      <Canvas onClick={onClicked}>
+        <SceneContext.Provider value={{ hasClicked }}>
+          <ErrorBoundary>
+            {scene && (
+              <>
+                <Environment environment={sceneWithMods.environment} />
+                <ElementsTree elements={sceneWithMods.elements} />
+              </>
+            )}
+            <Controls />
+          </ErrorBoundary>
+        </SceneContext.Provider>
       </Canvas>
       <ModificationControls
         toggleApplied={toggleApplied}

@@ -108,6 +108,20 @@ const publishElementsToIps = async (elements: ElementNodes) => {
         };
       }
 
+      if (element.elementType === ElementType.Image) {
+        const { imageConfig } = element;
+        return {
+          ...element,
+          children,
+          imageConfig: {
+            ...imageConfig,
+            fileUrl: imageConfig.fileUrl
+              ? await publishFile(imageConfig.fileUrl)
+              : undefined,
+          },
+        };
+      }
+
       return {
         key,
         element: {
@@ -260,7 +274,7 @@ const publishNft = async ({
   sceneConfig: SceneConfiguration;
   availableMods: AvailableModifications;
 }) => {
-  await publishToken({name, sceneConfig});
+  await publishToken({ name, sceneConfig });
 
   await Promise.all(
     Object.entries(availableMods).map(async ([key, mod]) => {

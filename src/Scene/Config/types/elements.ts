@@ -3,6 +3,7 @@ import { Nullable } from "./shared";
 export enum ElementType {
   Model = "model",
   Image = "image",
+  Video = "video",
   Water = "water",
 }
 
@@ -34,12 +35,17 @@ export type ImageElement = BaseElement & {
   imageConfig: ImageConfig;
 };
 
+export type VideoElement = BaseElement & {
+  elementType: ElementType.Video;
+  videoConfig: VideoConfig;
+};
+
 export type WaterElement = BaseElement & {
   elementType: ElementType.Water;
   waterConfig: WaterConfig;
 };
 
-export type Element = ModelElement | ImageElement | WaterElement;
+export type Element = ModelElement | ImageElement | WaterElement | VideoElement;
 
 export type ElementNodes = {
   [id: string]: Element;
@@ -51,6 +57,13 @@ export type ModelConfig = {
 
 export type ImageConfig = {
   fileUrl: string;
+};
+
+export type VideoConfig = {
+  file?: {
+    originalUrl?: string;
+    streamUrl?: string;
+  };
 };
 
 export type WaterConfig = {

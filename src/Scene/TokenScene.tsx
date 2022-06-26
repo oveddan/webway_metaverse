@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useToggleEffectContract } from "../web3/contract";
 import Profile from "../web3/Profile";
-import {
-  ModificationsWithStatus,
-} from "./Config/types/modifications";
+import { ModificationsWithStatus } from "./Config/types/modifications";
 import { useActiveEffects, useTokenScene } from "./lib/queries";
 import SceneRenderer from "./SceneRenderer";
 
@@ -53,7 +51,7 @@ const TokenScene = () => {
       },
       {}
     );
-  
+
     setModifications(combined);
   }, [tokenEffects, applied]);
 
