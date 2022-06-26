@@ -15,6 +15,7 @@ const TokenScene = () => {
 
   const tokenEffects = useActiveEffects(tokenId);
 
+  // @ts-ignore
   const { toggleEffect, applied } = useToggleEffectContract();
 
   const [modifications, setModifications] = useState<ModificationsWithStatus>(

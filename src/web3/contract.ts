@@ -1,11 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useContract, useContractWrite, useProvider, useSigner } from "wagmi";
 
 import deployedContracts from "./contracts/localhost_Webway.json";
 
-const args = [0, "makeSkyOnFire"];
-
-export const useToggleEffectContract = () => {
+export const useToggleEffectContract = (tokenId: number, effectId: string) => {
   // const provider = useProvider();
   const [applied, setApplied] = useState<{
     [effectId: string]: {
@@ -14,6 +12,8 @@ export const useToggleEffectContract = () => {
     };
   }>({});
   const { data: signerData } = useSigner();
+
+  const args = useMemo(() => ([tokenId, effectId]), [tokenId, effectId]);
 
   const { data, isError, isLoading, writeAsync } = useContractWrite(
     {
@@ -30,7 +30,7 @@ export const useToggleEffectContract = () => {
   );
 
   const toggleEffect = useCallback(
-    async (effectId: string) => {
+    async () => {
       if (applied[effectId]?.processing) return;
       setApplied((existing) => ({
         ...existing,

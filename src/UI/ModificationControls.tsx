@@ -3,6 +3,8 @@ import { AdjustmentsIcon } from "@heroicons/react/solid";
 import { SyntheticEvent, useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useOwner } from "../Scene/lib/queries";
+import { useParams } from "react-router-dom";
+import { useToggleEffectContract } from "../web3/contract";
 
 const ToggleCheckbox = ({
   modifierId: key,
@@ -15,14 +17,21 @@ const ToggleCheckbox = ({
   processing: boolean;
   toggle: (key: string) => void;
 }) => {
+  const { tokenId } = useParams<{
+    tokenId: string;
+  }>();
+  
+  const toggleEffect = useToggleEffectContract(+tokenId, key);
+
   const handleClick = useCallback(
+
     (e: SyntheticEvent) => {
       // e.preventDefault();
       // e.stopPropagation();
 
-      toggle(key);
+      toggleEffect.toggleEffect();
     },
-    [key, toggle]
+    [toggleEffect]
   );
 
   return (
