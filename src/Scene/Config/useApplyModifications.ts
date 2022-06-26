@@ -3,7 +3,10 @@ import { AppliedModifications } from "../../UI/ModificationControls";
 import { SceneConfiguration } from "./types/scene";
 import { Element, ElementNodes } from "./types/elements";
 import { cloneDeep, result, update } from "lodash";
-import { ModificationType } from "./types/modifications";
+import {
+  AvailableModifications,
+  ModificationType,
+} from "./types/modifications";
 import { Nullable } from "./types/shared";
 
 const findElement = (
@@ -23,8 +26,10 @@ const findElement = (
 const useApplyModifications = ({
   scene,
   appliedModifications,
+  availableMods,
 }: {
   scene?: SceneConfiguration;
+  availableMods?: AvailableModifications;
   appliedModifications: AppliedModifications;
 }) => {
   const [sceneWithMods, setSceneWithMods] =
@@ -33,7 +38,6 @@ const useApplyModifications = ({
   useEffect(() => {
     if (!scene) return;
 
-    const { availableMods } = scene;
     const resultEnvironment = {
       ...scene?.environment,
     };
@@ -42,6 +46,7 @@ const useApplyModifications = ({
 
     Object.entries(appliedModifications).forEach(
       ([key, appliedModification]) => {
+        if (!availableMods) return;
         if (!appliedModification.applied) return;
         const modification = availableMods[key];
         if (!modification) return;

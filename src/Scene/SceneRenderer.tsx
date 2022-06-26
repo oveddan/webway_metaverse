@@ -10,6 +10,7 @@ import ModificationControls, {
   AppliedModifications,
 } from "../UI/ModificationControls";
 import useApplyModifications from "./Config/useApplyModifications";
+import { AvailableModifications } from "./Config/types/modifications";
 
 const SceneRenderer = ({
   loading,
@@ -17,10 +18,12 @@ const SceneRenderer = ({
   scene,
   canAlwaysModify,
   tokenId,
+  availableModifications,
 }: {
   loading: boolean;
   valid?: boolean;
   scene?: SceneConfiguration;
+  availableModifications?: AvailableModifications;
   canAlwaysModify?: boolean;
   tokenId?: string;
 }) => {
@@ -77,7 +80,7 @@ const SceneRenderer = ({
       <ModificationControls
         toggleApplied={toggleApplied}
         applied={appliedModification}
-        modifications={scene?.availableMods}
+        modifications={availableModifications}
         canAlwaysModify={canAlwaysModify}
         tokenId={tokenId}
       />

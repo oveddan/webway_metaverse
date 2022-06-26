@@ -1,6 +1,6 @@
 import { AvailableModifications } from "../Scene/Config/types/modifications";
 import { AdjustmentsIcon } from "@heroicons/react/solid";
-import { SyntheticEvent, useCallback } from "react";
+import { SyntheticEvent, useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useOwner } from "../Scene/lib/queries";
 
@@ -65,7 +65,18 @@ const ModificationControls = ({
 
   const spaceOwner = useOwner(tokenId);
 
-  const isOwner = !!(account?.address && spaceOwner === account.address);
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    if (!account?.address || !spaceOwner) {
+      setIsOwner(false);
+      return;
+    }
+
+    const isOwner = account.address.toLowerCase() === spaceOwner.toLowerCase();
+
+    setIsOwner(isOwner);
+  }, [account?.address, spaceOwner]);
 
   const canModify = isOwner || canAlwaysModify;
 
@@ -77,12 +88,8 @@ const ModificationControls = ({
     >
       <div className="overflow-y-auto py-4 px-3 bg-gray-50 rounded dark:bg-gray-800">
         <ul className="space-y-2">
-          <li>
-            {`Space Token: ${tokenId}`}
-          </li>
-          {spaceOwner && (<li>
-            {`Owned by: ${spaceOwner}`}
-          </li>)}
+          <li>{`Space Token: ${tokenId}`}</li>
+          {spaceOwner && <li>{`Owned by: ${spaceOwner}`}</li>}
           {modifications && canModify && (
             <>
               <li className="font-bold" key="header">

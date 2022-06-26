@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import Profile from "../web3/Profile";
-import { useTokenScene } from "./lib/queries";
+import { useActiveEffects, useTokenScene } from "./lib/queries";
 import SceneRenderer from "./SceneRenderer";
 
 const TokenScene = () => {
@@ -9,6 +9,8 @@ const TokenScene = () => {
   }>();
 
   const tokenScene = useTokenScene(tokenId);
+
+  const tokenEffects = useActiveEffects(tokenId);
 
   return (
     <>

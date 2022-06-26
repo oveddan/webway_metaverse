@@ -25,12 +25,25 @@ const OWNERS_QUERY = `
 }
 `;
 
-const OWNERS_GQL = gql(OWNERS_QUERY);
 
-export type TokenQueryData = { tokenURIs: TokenUri[] };
-export type OwnersQueryData = { owners: {id: string }[]};
+const ACTIVE_EFFECTS_QUERY = `
+{
+  activeEffects {
+    id
+    type
+    uri
+  }
+}
+`;
 
 const TOKEN_GQL = gql(TOKEN_URIS_QUERY);
+const OWNERS_GQL = gql(OWNERS_QUERY);
+const ACTIVE_GQL = gql(ACTIVE_EFFECTS_QUERY);
+
+export type TokenQueryData = { tokenURIs: TokenUri[] };
+export type OwnersQueryData = { owners: { id: string }[] };
+export type ActiveEffectsQueryData = {  };
+
 
 export const useTokens = () => {
   const { loading, data: dataToken } = useQuery<TokenQueryData>(TOKEN_GQL, {
@@ -111,10 +124,10 @@ export const useOwner = (tokenId?: string) => {
 
     const parsedOwners = dataOwners?.owners?.map((result) => {
       const [owner, id] = result.id.split(" ");
-      return {owner, id};
+      return { owner, id };
     });
-      
-    const tokenOwner = parsedOwners?.find(({id}) => id === tokenId)?.owner;
+
+    const tokenOwner = parsedOwners?.find(({ id }) => id === tokenId)?.owner;
 
     if (tokenOwner) {
       setOwner(tokenOwner);
@@ -122,6 +135,37 @@ export const useOwner = (tokenId?: string) => {
       setOwner(undefined);
     }
   }, [loadingOwners, dataOwners, tokenId]);
+
+  return owner;
+};
+
+
+export const useActiveEffects = (tokenId?: string) => {
+  const { loading: loadingActive, data: dataActive } = useQuery(ACTIVE_GQL, { pollInterval: 2500 });
+
+  const [owner, setOwner] = useState<string>();
+
+  useEffect(() => {
+    if (loadingActive|| !tokenId) {
+      setOwner(undefined);
+      return;
+    }
+
+    console.log(dataActive);
+
+    // const parsedOwners = dataOwners?.owners?.map((result) => {
+    //   const [owner, id] = result.id.split(" ");
+    //   return { owner, id };
+    // });
+
+    // const tokenOwner = parsedOwners?.find(({ id }) => id === tokenId)?.owner;
+
+    // if (tokenOwner) {
+    //   setOwner(tokenOwner);
+    // } else {
+    //   setOwner(undefined);
+    // }
+  }, [loadingActive, dataActive, tokenId]);
 
   return owner;
 };

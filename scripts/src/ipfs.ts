@@ -14,10 +14,13 @@ import {
   ElementNodes,
   ElementType,
 } from "../../src/Scene/Config/types/elements";
-import marbleScene from "../../src/Scene/Config/marbleScene";
+import marbleScene, {
+  marbleSceneMods,
+} from "../../src/Scene/Config/marbleScene";
 import temp from "temp";
 import http from "https"; // or 'https' for https:// URLs
 import fs from "fs";
+import { AvailableModifications } from "../../src/Scene/Config/types/modifications";
 
 temp.track();
 
@@ -44,7 +47,7 @@ const pinata: Options = {
   },
 };
 
-const ipfs = create(localhost);
+const ipfs = create(infura);
 
 const ipfsGateway = "https://ipfs.io/ipfs/";
 // const pinataGateway = 'https://landa.mypinata.cloud';
@@ -135,7 +138,6 @@ const publishFilesInGraphToIpfs = async (
     elements: config.elements
       ? await publishElementsToIps(config.elements)
       : undefined,
-    availableMods: config.availableMods,
   };
 };
 
@@ -228,14 +230,11 @@ export interface Erc721Token {
   scene_config: SceneConfiguration;
 }
 
-const publishNft = async ({
-  name,
-  sceneConfig,
-}: {
-  name: string;
-  sceneConfig: SceneConfiguration;
+const publishToken = async ({name, sceneConfig}:{
+  name: string,
+  sceneConfig: SceneConfiguration
 }) => {
-  const configJson = await publishFilesInGraphToIpfs(sceneConfig);
+const configJson = await publishFilesInGraphToIpfs(sceneConfig);
 
   const tokenMetadata: Erc721Token = {
     name,
@@ -246,10 +245,33 @@ const publishNft = async ({
   const tokenIpfsCif = await ipfs.add(JSON.stringify(tokenMetadata, null, 2));
 
   const tokenIpfsCifUrl = toIpfsAddress(tokenIpfsCif.cid);
-  console.log("published to:", tokenIpfsCifUrl);
+  console.log("token ipfs address:", tokenIpfsCifUrl);
+
+}
+
+const publishNft = async ({
+  name,
+  sceneConfig,
+  availableMods,
+}: {
+  name: string;
+  sceneConfig: SceneConfiguration;
+  availableMods: AvailableModifications;
+}) => {
+  // await publishToken({name, sceneConfig});
+  
+  await Promise.all(
+    Object.entries(availableMods).map(async ([key, mod]) => {
+      const modIpfsCid = await ipfs.add(JSON.stringify(mod, null, 2));
+
+      const modIpfsCifUrl = toIpfsAddress(modIpfsCid.cid);
+      console.log("mod ipfs address:", key, modIpfsCifUrl);
+    })
+  );
 };
 
 publishNft({
   sceneConfig: marbleScene,
+  availableMods: marbleSceneMods,
   name: "marble scene",
 });

@@ -1,6 +1,9 @@
 import { toIpfsUrl } from "../lib/ipfs";
 import { ElementType } from "./types/elements";
-import { ModificationType } from "./types/modifications";
+import {
+  AvailableModifications,
+  ModificationType,
+} from "./types/modifications";
 import { SceneConfiguration } from "./types/scene";
 
 const marbleScene: SceneConfiguration = {
@@ -27,25 +30,25 @@ const marbleScene: SceneConfiguration = {
       },
     },
   },
-  availableMods: {
-    changeWaterColor: {
-      modificationType: ModificationType.UpdateElement,
-      description: "Make Water Green",
-      path: ["water"],
-      updates: [
-        {
-          path: ["waterConfig", "color"],
-          newValue: "green",
-        },
-      ],
-    },
-    makeSkyOnFire: {
-      modificationType: ModificationType.ChangeEnvironment,
-      description: "Make the Sky On Fire",
-      environmentFileUrl: toIpfsUrl(
-        "QmeK5K7uL6B1NAH6cYKK7eE5XfnUv7r7jGajRwRQHVZz5W"
-      ),
-    },
+};
+export const marbleSceneMods: AvailableModifications = {
+  changeWaterColor: {
+    modificationType: ModificationType.UpdateElement,
+    description: "Make Water Green",
+    path: ["water"],
+    updates: [
+      {
+        path: ["waterConfig", "color"],
+        newValue: "green",
+      },
+    ],
+  },
+  makeSkyOnFire: {
+    modificationType: ModificationType.ChangeEnvironment,
+    description: "Make the Sky On Fire",
+    environmentFileUrl: toIpfsUrl(
+      "QmeK5K7uL6B1NAH6cYKK7eE5XfnUv7r7jGajRwRQHVZz5W"
+    ),
   },
 };
 
