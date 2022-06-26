@@ -64,6 +64,7 @@ export type VideoConfig = {
     originalUrl?: string;
     streamUrl?: string;
   };
+  volume?: number;
 };
 
 export type WaterConfig = {

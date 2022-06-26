@@ -55,6 +55,7 @@ const marbleScene: SceneConfiguration = {
           originalUrl:
             "https://firebasestorage.googleapis.com/v0/b/mintxr-experiment.appspot.com/o/MelodicThenRythm_2.mp4?alt=media&token=1453b8ea-1e30-4ded-9b6d-809423c45bb6",
         },
+        volume: 200
       },
       transform: {
         position: {

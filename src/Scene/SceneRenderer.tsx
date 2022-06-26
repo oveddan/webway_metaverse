@@ -8,8 +8,9 @@ import { SceneConfiguration } from "./Config/types/scene";
 import ModificationControls from "../UI/ModificationControls";
 import useApplyModifications from "./Config/useApplyModifications";
 import { ModificationsWithStatus } from "./Config/types/modifications";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SceneContext } from "./SceneContext";
+import { AudioListener } from "three";
 
 const SceneRenderer = ({
   loading,
@@ -35,9 +36,13 @@ const SceneRenderer = ({
 
   const [hasClicked, setHasClicked] = useState(false);
 
+  const [listener, setListener] = useState<AudioListener>();
+
   const onClicked = useCallback(() => {
     if (hasClicked) return;
     setHasClicked(true);
+  
+    setListener(new AudioListener());
   }, [hasClicked]);
 
   if (loading || !sceneWithMods) return <h1>loading...</h1>;
@@ -46,9 +51,9 @@ const SceneRenderer = ({
 
   return (
     <>
-      <Canvas onClick={onClicked}>
-        <SceneContext.Provider value={{ hasClicked }}>
           <ErrorBoundary>
+      <Canvas onClick={onClicked}>
+        <SceneContext.Provider value={{ hasClicked, listener }}>
             {scene && (
               <>
                 <Environment environment={sceneWithMods.environment} />
@@ -56,7 +61,6 @@ const SceneRenderer = ({
               </>
             )}
             <Controls />
-          </ErrorBoundary>
         </SceneContext.Provider>
       </Canvas>
       <ModificationControls
@@ -65,6 +69,7 @@ const SceneRenderer = ({
         canAlwaysModify={canAlwaysModify}
         tokenId={tokenId}
       />
+</ErrorBoundary>
     </>
   );
 };
