@@ -122,6 +122,21 @@ const publishElementsToIps = async (elements: ElementNodes) => {
         };
       }
 
+      if (element.elementType === ElementType.Video) {
+        const { videoConfig } = element;
+        return {
+          ...element,
+          children,
+          videoConfig: {
+            ...videoConfig,
+            file: {
+              originalUrl: videoConfig?.file?.originalUrl
+                ? await publishFile(videoConfig.file.originalUrl)
+                : undefined,
+            },
+          },
+        };
+      }
       return {
         key,
         element: {

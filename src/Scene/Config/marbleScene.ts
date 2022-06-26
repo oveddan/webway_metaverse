@@ -55,7 +55,7 @@ const marbleScene: SceneConfiguration = {
           originalUrl:
             "https://firebasestorage.googleapis.com/v0/b/mintxr-experiment.appspot.com/o/MelodicThenRythm_2.mp4?alt=media&token=1453b8ea-1e30-4ded-9b6d-809423c45bb6",
         },
-        volume: 200
+        volume: 10,
       },
       transform: {
         position: {
@@ -90,6 +90,17 @@ export const marbleSceneMods: AvailableModifications = {
     environmentFileUrl: toIpfsUrl(
       "QmeK5K7uL6B1NAH6cYKK7eE5XfnUv7r7jGajRwRQHVZz5W"
     ),
+  },
+  raiseVideoVolume: {
+    modificationType: ModificationType.UpdateElement,
+    description: "Raise the Video Volume",
+    path: ["video"],
+    updates: [
+      {
+        path: ["videoConfig", "volume"],
+        newValue: 500,
+      },
+    ],
   },
 };
 

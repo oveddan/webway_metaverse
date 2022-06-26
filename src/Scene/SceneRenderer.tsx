@@ -41,7 +41,7 @@ const SceneRenderer = ({
   const onClicked = useCallback(() => {
     if (hasClicked) return;
     setHasClicked(true);
-  
+
     setListener(new AudioListener());
   }, [hasClicked]);
 
@@ -51,9 +51,9 @@ const SceneRenderer = ({
 
   return (
     <>
-          <ErrorBoundary>
-      <Canvas onClick={onClicked}>
-        <SceneContext.Provider value={{ hasClicked, listener }}>
+      <ErrorBoundary>
+        <Canvas onClick={onClicked}>
+          <SceneContext.Provider value={{ hasClicked, listener }}>
             {scene && (
               <>
                 <Environment environment={sceneWithMods.environment} />
@@ -61,15 +61,15 @@ const SceneRenderer = ({
               </>
             )}
             <Controls />
-        </SceneContext.Provider>
-      </Canvas>
-      <ModificationControls
-        toggleApplied={toggleApplied}
-        modifications={modifications}
-        canAlwaysModify={canAlwaysModify}
-        tokenId={tokenId}
-      />
-</ErrorBoundary>
+          </SceneContext.Provider>
+        </Canvas>
+        <ModificationControls
+          toggleApplied={toggleApplied}
+          modifications={modifications}
+          canAlwaysModify={canAlwaysModify}
+          tokenId={tokenId}
+        />
+      </ErrorBoundary>
     </>
   );
 };

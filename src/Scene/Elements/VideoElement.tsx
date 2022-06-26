@@ -13,7 +13,13 @@ const Stream = ({}: { url: string }) => {
   return null;
 };
 
-const VideoFilePlayer = ({ url, volume = 20}: { url: string, volume?: number }) => {
+const VideoFilePlayer = ({
+  url,
+  volume = 20,
+}: {
+  url: string;
+  volume?: number;
+}) => {
   const context = useContext(SceneContext);
   const hasClicked = context?.hasClicked;
   const listener = context?.listener;
@@ -48,10 +54,10 @@ const VideoFilePlayer = ({ url, volume = 20}: { url: string, volume?: number }) 
       const positionalAudio = new PositionalAudio(listener);
 
       setPositionalAudio(positionalAudio);
-    
+
       return () => {
         positionalAudio.disconnect();
-      }
+      };
     }
   }, [listener]);
 
@@ -60,7 +66,7 @@ const VideoFilePlayer = ({ url, volume = 20}: { url: string, volume?: number }) 
 
     positionalAudio.setRolloffFactor(1.5);
     positionalAudio.setRefDistance(volume);
-  }, [positionalAudio, volume])
+  }, [positionalAudio, volume]);
 
   const [meshRef, setMeshRef] = useState<Mesh | null>(null);
 
@@ -70,11 +76,11 @@ const VideoFilePlayer = ({ url, volume = 20}: { url: string, volume?: number }) 
     positionalAudio.setMediaElementSource(video);
 
     meshRef.add(positionalAudio);
-  
+
     return () => {
       positionalAudio.disconnect();
       meshRef.remove(positionalAudio);
-    }
+    };
   }, [meshRef, positionalAudio]);
 
   return (
@@ -96,7 +102,9 @@ const VideoElement = ({ config }: { config: VideoConfig }) => {
 
   if (!config.file?.originalUrl) return null;
 
-  return <VideoFilePlayer url={config.file.originalUrl} volume={config.volume} />;
+  return (
+    <VideoFilePlayer url={config.file.originalUrl} volume={config.volume} />
+  );
 };
 
 export default VideoElement;
