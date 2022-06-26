@@ -29,9 +29,15 @@ const ToggleCheckbox = ({
       // e.preventDefault();
       // e.stopPropagation();
 
+      if (tokenId) {
+
       toggleEffect.toggleEffect();
+      } else {
+        toggle(key);
+      }
+
     },
-    [toggleEffect]
+    [key, toggle, toggleEffect, tokenId]
   );
 
   return (
