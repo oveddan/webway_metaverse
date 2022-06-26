@@ -5,20 +5,21 @@ import { Nullable } from "../Config/types/shared";
 import ModelElement from "./ModelElement";
 import ElementsTree from "./ElementsTree";
 import WaterElement from "./WaterElement";
+import ImageElement from "./ImageElement";
 
-const useTransform = (transformConfig?: Nullable<Transform>) => {
-  const [transform, setTransform] = useState<{
+const useTransform = (transform?: Nullable<Transform>) => {
+  const [convertedTrasnform, setTransform] = useState<{
     position?: Vector3;
     rotation?: Vector3;
     scale?: Vector3;
   }>({});
 
   useEffect(() => {
-    if (!transform) {
+    if (!convertedTrasnform) {
       setTransform({});
       return;
     }
-    const { position, rotation, scale } = transform;
+    const { position, rotation, scale } = convertedTrasnform;
 
     const positionVector = position
       ? new Vector3(position.x, position.y, position.z)
@@ -35,20 +36,28 @@ const useTransform = (transformConfig?: Nullable<Transform>) => {
       rotation: rotationVector,
       scale: scaleVector,
     });
-  }, [transform, transformConfig]);
+  }, [convertedTrasnform, transform]);
 
-  return transform;
+  return convertedTrasnform;
 };
 
 const ElementComponent = ({ config }: { config: Element }) => {
-  const transform = useTransform(config.transform);
+  const transform = config.transform
 
   return (
     <group
-      position={transform.position}
-      scale={transform.scale}
+      position-x={transform?.position?.x}
+      position-y={transform?.position?.y}
+      position-z={transform?.position?.z}
+      scale-x={transform?.scale?.x}
+      scale-y={transform?.scale?.y}
+      scale-z={transform?.scale?.z}
+      rotate-x={transform?.rotation?.x}
+      rotate-y={transform?.rotation?.y}
+      rotate-z={transform?.rotation?.z}
+      // scale={transform.scale}
       // @ts-ignore
-      rotation={transform.rotation}
+      // rotation={transform.rotation}
     >
       {config.elementType === ElementType.Model && (
         <ModelElement config={config.modelConfig} />
@@ -56,6 +65,10 @@ const ElementComponent = ({ config }: { config: Element }) => {
 
       {config.elementType === ElementType.Water && (
         <WaterElement config={config.waterConfig} />
+      )}
+
+      {config.elementType === ElementType.Image && (
+        <ImageElement config={config.imageConfig} />
       )}
 
       <ElementsTree elements={config.children} />

@@ -29,6 +29,24 @@ const marbleScene: SceneConfiguration = {
         scale: 10,
       },
     },
+  image: {
+    elementType: ElementType.Image,
+    imageConfig: {
+      fileUrl: 'https://firebasestorage.googleapis.com/v0/b/mintxr-experiment.appspot.com/o/oiltimercolored_hu86ad23eb56ff66ff007b5a426357b158_7375980_700x0_resize_box_2.png?alt=media&token=d311f24a-6257-460c-ab32-413859fb75d4'
+    },
+    transform: {
+      position: {
+        y: 5,
+        z: -33,
+        x: 0
+      },
+      scale: {
+        x: 5,
+        y: 5,
+        z: 5
+      }
+    }
+  }
   },
 };
 export const marbleSceneMods: AvailableModifications = {

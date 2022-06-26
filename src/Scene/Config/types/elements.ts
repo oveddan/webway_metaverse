@@ -7,15 +7,15 @@ export enum ElementType {
 }
 
 export type IVector3 = {
-  x: number;
-  y: number;
-  z: number;
+  x?: number;
+  y?: number;
+  z?: number;
 };
 
 export type Transform = {
-  position: IVector3;
-  rotation: IVector3;
-  scale: IVector3;
+  position?: IVector3;
+  rotation?: IVector3;
+  scale?: IVector3;
 };
 
 export type BaseElement = {
