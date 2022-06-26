@@ -260,7 +260,7 @@ const publishNft = async ({
   sceneConfig: SceneConfiguration;
   availableMods: AvailableModifications;
 }) => {
-  // await publishToken({name, sceneConfig});
+  await publishToken({name, sceneConfig});
 
   await Promise.all(
     Object.entries(availableMods).map(async ([key, mod]) => {
