@@ -1,42 +1,37 @@
 import { useCallback, useState } from "react";
-import { useContractWrite, useProvider } from "wagmi";
+import { useContract, useContractWrite, useProvider, useSigner } from "wagmi";
 
-import deployedContracts from "./contracts/hardhat_contracts.json";
+import deployedContracts from "./contracts/localhost_Webway.json";
 
-export const useAddEffectContract = () => {
-  const provider = useProvider();
-  const { data, isError, isLoading, write } = useContractWrite(
-    {
-      addressOrName: "0xecb504d39723b0be0e3a9aa33d646642d1051ee1",
-      contractInterface:
-        deployedContracts[31337].localhost.contracts.Webway.abi,
-      signerOrProvider: provider,
-    },
-    "addEffect"
-  );
-};
+const args = [0, "makeSkyOnFire"];
 
 export const useToggleEffectContract = () => {
-  const provider = useProvider();
+  // const provider = useProvider();
   const [applied, setApplied] = useState<{
     [effectId: string]: {
       processing: boolean;
       error?: boolean;
     };
   }>({});
+  const { data: signerData } = useSigner();
+
   const { data, isError, isLoading, writeAsync } = useContractWrite(
     {
-      addressOrName: "0xecb504d39723b0be0e3a9aa33d646642d1051ee1",
-      contractInterface:
-        deployedContracts[31337].localhost.contracts.Webway.abi,
-      signerOrProvider: provider,
+      addressOrName: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      contractInterface: deployedContracts,
+      // contractInterface:
+      //   deployedContracts[31337].localhost.contracts.Webway.abi,
+      signerOrProvider: signerData,
     },
-    "toggleEffect"
+    "toggleEffect",
+    {
+      args,
+    }
   );
 
   const toggleEffect = useCallback(
     async (effectId: string) => {
-      if (applied[effectId].processing) return;
+      if (applied[effectId]?.processing) return;
       setApplied((existing) => ({
         ...existing,
         [effectId]: {
@@ -45,9 +40,7 @@ export const useToggleEffectContract = () => {
       }));
 
       try {
-        await writeAsync({
-          args: [effectId],
-        });
+        await writeAsync();
       } catch (e) {
         setApplied((existing) => ({
           ...existing,
@@ -65,8 +58,8 @@ export const useToggleEffectContract = () => {
         },
       }));
     },
-    [applied]
+    [applied, writeAsync]
   );
 
-  return toggleEffect;
+  return {toggleEffect, applied};
 };

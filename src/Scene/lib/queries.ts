@@ -1,8 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Erc721Token } from "../Config/token";
 import { Modification } from "../Config/types/modifications";
 import { SceneConfiguration } from "../Config/types/scene";
+import { convertURIToHTTPS } from "./ipfs";
 
 const TOKEN_URIS_QUERY = `
 {
@@ -26,9 +27,11 @@ const OWNERS_QUERY = `
 }
 `;
 
-const ACTIVE_EFFECTS_QUERY = `
+const activeEffectsQuery = (tokenId: string)=> gql`
 {
-  activeEffects {
+  activeEffects(where: {tokenId: "${tokenId}"}) {
+    uri,
+    key,
     active
   }
 }
@@ -36,7 +39,6 @@ const ACTIVE_EFFECTS_QUERY = `
 
 const TOKEN_GQL = gql(TOKEN_URIS_QUERY);
 const OWNERS_GQL = gql(OWNERS_QUERY);
-const ACTIVE_GQL = gql(ACTIVE_EFFECTS_QUERY);
 
 export type TokenQueryData = { tokenURIs: TokenUri[] };
 export type OwnersQueryData = { owners: { id: string }[] };
@@ -143,16 +145,18 @@ type ActiveEffects = {
 };
 
 type ActiveEffectsQueryResult = {
-  name: string;
+  key: string;
   uri: string;
   active: boolean;
-  id: string;
 }[];
 
 export const useActiveEffects = (tokenId?: string) => {
+  // @ts-ignore
+  const query = useMemo(() => activeEffectsQuery(tokenId), [tokenId]);
   const { loading: loadingActive, data: dataActive } = useQuery<{
     activeEffects: ActiveEffectsQueryResult;
-  }>(ACTIVE_GQL, { pollInterval: 2500 });
+  // @ts-ignore
+  }>(query, { pollInterval: 2500 });
 
   const [effects, setEffects] = useState<ActiveEffects>();
 
@@ -167,14 +171,15 @@ export const useActiveEffects = (tokenId?: string) => {
     (async () => {
       const parsedEffects = await Promise.all(
         dataActive.activeEffects.map(async (effect) => {
+          const toFetch = convertURIToHTTPS({url:effect.uri});
+          const data = await fetch(toFetch);
           const modification = (await (
-            await fetch(effect.uri)
+           data 
           ).json()) as Modification;
           return {
             active: effect.active,
             modification,
-            name: effect.name,
-            id: effect.id,
+            name: effect.key,
           };
         })
       );
@@ -182,7 +187,7 @@ export const useActiveEffects = (tokenId?: string) => {
       const reduced = parsedEffects.reduce((x: ActiveEffects, effect) => {
         return {
           ...x,
-          [effect.id]: effect,
+          [effect.name]: effect,
         };
       }, {});
 
