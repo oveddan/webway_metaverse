@@ -58,7 +58,6 @@ const TokenScene = () => {
 
   return (
     <>
-      <Profile />
       <SceneRenderer
         {...tokenScene}
         modifications={modifications}

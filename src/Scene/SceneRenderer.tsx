@@ -52,23 +52,12 @@ const SceneRenderer = ({
   return (
     <>
       <ErrorBoundary>
-        <Canvas onClick={onClicked}>
-          <SceneContext.Provider value={{ hasClicked, listener }}>
-            {scene && (
-              <>
-                <Environment environment={sceneWithMods.environment} />
-                <group position-y={-2}><ElementsTree elements={sceneWithMods.elements} /></group>
-              </>
-            )}
-            <Controls />
-          </SceneContext.Provider>
+        <Canvas>
+          <mesh>
+            <boxBufferGeometry />
+            <meshBasicMaterial color="red" />
+          </mesh>
         </Canvas>
-        <ModificationControls
-          toggleApplied={toggleApplied}
-          modifications={modifications}
-          canAlwaysModify={canAlwaysModify}
-          tokenId={tokenId}
-        />
       </ErrorBoundary>
     </>
   );
