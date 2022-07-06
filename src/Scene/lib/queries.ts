@@ -83,6 +83,7 @@ export const useTokenScene = (tokenId: string) => {
 
     const tokenForId = tokens.find(({ id }) => id === tokenId);
 
+    console.log({tokenId,tokens, tokenForId});
     if (!tokenForId) {
       setScene({
         loading: false,
@@ -92,8 +93,14 @@ export const useTokenScene = (tokenId: string) => {
     }
 
     (async () => {
+      if (!tokenForId?.uri) return;
+
+      const ipfsUrl = convertURIToHTTPS({url:tokenForId?.uri});
+
+      console.log({ipfsUrl});
+
       const tokenJson = (await (
-        await fetch(tokenForId?.uri)
+        await fetch(ipfsUrl )
       ).json()) as Erc721Token;
 
       setScene({

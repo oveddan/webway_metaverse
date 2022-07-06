@@ -12,6 +12,11 @@ const ModelElementInner = ({ fileUrl }: { fileUrl: string }) => {
 const ModelElement = ({ config }: { config?: Nullable<ModelConfig> }) => {
   const fileUrl = useHttpsUriForIpfs(config?.fileUrl);
 
+  console.log(
+
+    {modelFile: fileUrl}
+  );
+
   if (!fileUrl) return null;
 
   return <ModelElementInner fileUrl={fileUrl} />;

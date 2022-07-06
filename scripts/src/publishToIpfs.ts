@@ -21,6 +21,12 @@ import temp from "temp";
 import http from "https"; // or 'https' for https:// URLs
 import fs from "fs";
 import { AvailableModifications } from "../../src/Scene/Config/types/modifications";
+import "dotenv/config";
+import { NFTStorage, File, CIDString } from "nft.storage";
+import path from "path";
+import mime from "mime";
+
+const NFT_STORAGE_KEY = process.env.NFT_STORAGE_KEY;
 
 temp.track();
 
@@ -37,6 +43,8 @@ const infura = { host: "ipfs.infura.io", port: 5001, protocol: "https" };
 // run your own ipfs daemon: https://docs.ipfs.io/how-to/command-line-quick-start/#install-ipfs
 const localhost = { host: "127.0.0.1", port: 5002, protocol: "http" };
 
+const nftStorage = new NFTStorage({ token: NFT_STORAGE_KEY });
+
 const pinata: Options = {
   host: "api.pinata.cloud",
   apiPath: "psa",
@@ -47,7 +55,19 @@ const pinata: Options = {
   },
 };
 
-const ipfs = create(infura);
+const nftStorageParams: Options = {
+  host: "api.nft.storage",
+  apiPath: "pins",
+  port: 443,
+  protocol: "https",
+  headers: {
+    Authorization: `Bearer ${NFT_STORAGE_KEY}`,
+    ["Content-Type"]: "application/json",
+    Accept: "*/*",
+  },
+};
+
+const ipfs = create(nftStorageParams);
 
 const ipfsGateway = "https://ipfs.io/ipfs/";
 // const pinataGateway = 'https://landa.mypinata.cloud';
@@ -77,9 +97,18 @@ const downloadTempFile = async (remoteUrl: string) => {
   });
 };
 
-const toIpfsAddress = (cid: CID) => `ipfs.io/${cid.toString()}`;
+const saveTempFileString = async (contents: string) => {
+  const tempLocation = await temp.open("tempFile");
 
-const publishFile = async (url: string) => {
+  await fs.promises.writeFile(tempLocation.path, contents);
+
+  console.log('wrote to', tempLocation.path)
+
+  return tempLocation.path;
+
+}
+
+const publishFileUsingIpfsPost = async (url: string) => {
   console.log("publishing file", url);
   // const tempFile = await downloadTempFile(url)
   const urlS = urlSource(url);
@@ -88,6 +117,34 @@ const publishFile = async (url: string) => {
 
   return toIpfsAddress(result.cid);
 };
+
+const publishBlobToNftStorage = async (url: string) => {
+  const filePath = await downloadTempFile(url);
+
+  const file = await fileFromPath(filePath);
+
+  
+  const cid = await nftStorage.storeBlob(file);
+
+  // @ts-ignore
+  return toIpfsAddress(cid);
+}
+
+/**
+ * A helper to read a file from a location on disk and return a File object.
+ * Note that this reads the entire file into memory and should not be used for
+ * very large files.
+ * @param {string} filePath the path to a file to store
+ * @returns {File} a File object containing the file content
+ */
+async function fileFromPath(filePath: string) {
+  const content = await fs.promises.readFile(filePath);
+  // @ts-ignore
+  const type = mime.getType(filePath);
+  return new File([content], path.basename(filePath), { type });
+}
+
+const toIpfsAddress = (cid: CID | CIDString) => `ipfs://${cid.toString()}`;
 
 const publishElementsToIps = async (elements: ElementNodes) => {
   const result = await Promise.all(
@@ -104,7 +161,7 @@ const publishElementsToIps = async (elements: ElementNodes) => {
             modelConfig: {
               ...element.modelConfig,
               fileUrl: element.modelConfig.fileUrl
-                ? await publishFile(element.modelConfig.fileUrl)
+                ? await publishBlobToNftStorage (element.modelConfig.fileUrl)
                 : undefined,
             },
           },
@@ -121,7 +178,7 @@ const publishElementsToIps = async (elements: ElementNodes) => {
             imageConfig: {
               ...imageConfig,
               fileUrl: imageConfig.fileUrl
-                ? await publishFile(imageConfig.fileUrl)
+                ? await publishBlobToNftStorage (imageConfig.fileUrl)
                 : undefined,
             },
           },
@@ -139,7 +196,7 @@ const publishElementsToIps = async (elements: ElementNodes) => {
               ...videoConfig,
               file: {
                 originalUrl: videoConfig?.file?.originalUrl
-                  ? await publishFile(videoConfig.file.originalUrl)
+                  ? await publishBlobToNftStorage (videoConfig.file.originalUrl)
                   : undefined,
               },
             },
@@ -170,7 +227,7 @@ const publishFilesInGraphToIpfs = async (
   return {
     environment: {
       fileUrl: config.environment?.fileUrl
-        ? await publishFile(config.environment.fileUrl)
+        ? await publishBlobToNftStorage(config.environment.fileUrl)
         : undefined,
     },
     elements: config.elements
@@ -178,6 +235,21 @@ const publishFilesInGraphToIpfs = async (
       : undefined,
   };
 };
+
+const publishJsonToIpfs = async (json: object) => {
+       const storedJsonPath = await saveTempFileString(JSON.stringify(json));
+      const file = await fileFromPath(storedJsonPath);
+      // file.type = 'text/json';
+      // const file =new Blob([JSON.stringify(json)], {
+      //   type: 'text/json'
+      // });
+      const modIpfsCid = await nftStorage.storeBlob(file );
+
+      return modIpfsCid;
+
+      
+
+}
 
 const publishConfigToIpfs = async (config: SceneConfiguration) => {
   const withFileOnIpFs = await publishFilesInGraphToIpfs(config);
@@ -197,68 +269,6 @@ export const pushDirectoryToIPFS = async (path: string) => {
     resp.push(f);
   }
   return resp;
-};
-
-const publishHashToIPNS = async (ipfsHash: string) => {
-  const response = await ipfs.name.publish(`/ipfs/${ipfsHash}`);
-  return response;
-};
-
-const nodeMayAllowPublish = (ipfsClient: IPFSHTTPClient) => {
-  // You must have your own IPFS node in order to publish an IPNS name
-  // This contains a blacklist of known nodes which do not allow users to publish IPNS names.
-  const nonPublishingNodes = ["ipfs.infura.io"];
-  const { host } = ipfsClient.getEndpointConfig();
-  return !nonPublishingNodes.some((nodeUrl) => host.includes(nodeUrl));
-};
-
-export const deploy = async () => {
-  console.log("🛰  Sending to IPFS...");
-  const results = await pushDirectoryToIPFS("./build");
-  if (results.length === 0) {
-    console.log(`📡 App deployment failed`);
-    return false;
-  }
-
-  const cid = results[results.length - 1].cid;
-  console.log(
-    `📡 App deployed to IPFS with hash: ${chalk.cyan(cid.toString())}`
-  );
-
-  console.log();
-
-  let ipnsName = "";
-  if (nodeMayAllowPublish(ipfs)) {
-    console.log(`✍️  Publishing /ipfs/${cid.toString()} to IPNS...`);
-    process.stdout.write(
-      "   Publishing to IPNS can take up to roughly two minutes.\r"
-    );
-    ipnsName = (await publishHashToIPNS(cid.toString())).name;
-    clearLine(process.stdout, 0);
-    if (!ipnsName) {
-      console.log("   Publishing IPNS name on node failed.");
-    }
-    console.log(`🔖 App published to IPNS with name: ${chalk.cyan(ipnsName)}`);
-    console.log();
-  }
-
-  console.log("🚀 Deployment to IPFS complete!");
-  console.log();
-
-  console.log(`Use the link${ipnsName && "s"} below to access your app:`);
-  console.log(`   IPFS: ${chalk.cyan(`${ipfsGateway}${cid.toString()}`)}`);
-  if (ipnsName) {
-    console.log(`   IPNS: ${chalk.cyan(`${ipnsGateway}${ipnsName}`)}`);
-    console.log();
-    console.log(
-      "Each new deployment will have a unique IPFS hash while the IPNS name will always point at the most recent deployment."
-    );
-    console.log(
-      "It is recommended that you share the IPNS link so that people always see the newest version of your app."
-    );
-  }
-  console.log();
-  return true;
 };
 
 export interface Erc721Token {
@@ -288,9 +298,15 @@ const publishToken = async ({
     scene_config: configJson,
   };
 
-  const tokenIpfsCif = await ipfs.add(JSON.stringify(tokenMetadata, null, 2));
+  const tokenIpfsCif = await publishJsonToIpfs(tokenMetadata);
+  // const tokenIpfsCif = await ipfs.add(JSON.stringify(tokenMetadata, null, 2));
 
-  const tokenIpfsCifUrl = toIpfsAddress(tokenIpfsCif.cid);
+  console.log('published token:');
+
+  console.log(JSON.stringify(tokenMetadata, null, 2));
+
+  // @ts-ignore
+  const tokenIpfsCifUrl = toIpfsAddress(tokenIpfsCif);
   console.log("token ipfs address:", tokenIpfsCifUrl);
 };
 
@@ -303,13 +319,16 @@ const publishNft = async ({
   sceneConfig: SceneConfiguration;
   availableMods: AvailableModifications;
 }) => {
+  
   await publishToken({ name, sceneConfig });
+
+  console.log('token published');
 
   await Promise.all(
     Object.entries(availableMods).map(async ([key, mod]) => {
-      const modIpfsCid = await ipfs.add(JSON.stringify(mod, null, 2));
+      const modIpfsCid = await publishJsonToIpfs(mod);
 
-      const modIpfsCifUrl = toIpfsAddress(modIpfsCid.cid);
+      const modIpfsCifUrl = toIpfsAddress(modIpfsCid);
       console.log("mod ipfs address:", key, modIpfsCifUrl);
     })
   );

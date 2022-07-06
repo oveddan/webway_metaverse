@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Nullable } from "../Config/types/shared";
 
-const nftStorageGateway = "https://nftstorage.link/ipfs";
-const localStorageGateway = "http://127.0.0.1:8080/ipfs";
-const ipfsGateway = "https://ipfs.io/ipfs";
+const nftStorageGateway = "https://nftstorage.link";
+const localStorageGateway = "http://127.0.0.1:8080";
+const ipfsGateway = "https://ipfs.io";
 function convertURIToHTTPSInner({
   url,
-  ipfsHost = nftStorageGateway ,
+  ipfsHost = ipfsGateway,
 }: {
   url: string | undefined;
   ipfsHost?: string;
@@ -48,4 +48,4 @@ export const useHttpsUriForIpfs = (ipfsUrl?: Nullable<string>) => {
   return result;
 };
 
-export const toIpfsUrl = (cid: string) => `ipfs.io/${cid}`;
+export const toIpfsUrl = (cid: string) => `ipfs://${cid}`;
