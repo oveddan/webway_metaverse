@@ -3,10 +3,12 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { DoubleSide, Mesh, PositionalAudio, sRGBEncoding } from "three";
 import { VideoConfig } from "../Config/types/elements";
+import { useHttpsUriForIpfs } from "../lib/ipfs";
 import { SceneContext } from "../SceneContext";
 
 const Stream = ({}: { url: string }) => {
@@ -26,6 +28,8 @@ const VideoFilePlayer = ({
 
   const [aspect, setAspect] = useState(1);
 
+  const ipfsUrl = useHttpsUriForIpfs(url);
+
   const handleMetadataLoaded = useCallback((e: SyntheticEvent) => {
     const videoElement = e.target as HTMLVideoElement;
 
@@ -39,7 +43,7 @@ const VideoFilePlayer = ({
 
   const [video] = useState(() =>
     Object.assign(document.createElement("video"), {
-      src: url,
+      src: ipfsUrl ,
       crossOrigin: "Anonymous",
       loop: true,
       onloadedmetadata: handleMetadataLoaded,

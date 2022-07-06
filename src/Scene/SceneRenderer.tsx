@@ -57,7 +57,9 @@ const SceneRenderer = ({
             {scene && (
               <>
                 <Environment environment={sceneWithMods.environment} />
-                <group position-y={-2}><ElementsTree elements={sceneWithMods.elements} /></group>
+                <group position-y={-2}>
+                  <ElementsTree elements={sceneWithMods.elements} />
+                </group>
               </>
             )}
             <Controls />
