@@ -13,7 +13,7 @@ export const useToggleEffectContract = (tokenId: number, effectId: string) => {
   }>({});
   const { data: signerData } = useSigner();
 
-  const args = useMemo(() => [tokenId, effectId], [tokenId, effectId]);
+  const args = useMemo(() => ([tokenId, effectId]), [tokenId, effectId]);
 
   const { data, isError, isLoading, writeAsync } = useContractWrite(
     {
@@ -29,34 +29,37 @@ export const useToggleEffectContract = (tokenId: number, effectId: string) => {
     }
   );
 
-  const toggleEffect = useCallback(async () => {
-    if (applied[effectId]?.processing) return;
-    setApplied((existing) => ({
-      ...existing,
-      [effectId]: {
-        processing: true,
-      },
-    }));
-
-    try {
-      await writeAsync();
-    } catch (e) {
+  const toggleEffect = useCallback(
+    async () => {
+      if (applied[effectId]?.processing) return;
       setApplied((existing) => ({
         ...existing,
         [effectId]: {
-          error: true,
+          processing: true,
+        },
+      }));
+
+      try {
+        await writeAsync();
+      } catch (e) {
+        setApplied((existing) => ({
+          ...existing,
+          [effectId]: {
+            error: true,
+            processing: false,
+          },
+        }));
+        return;
+      }
+      setApplied((existing) => ({
+        ...existing,
+        [effectId]: {
           processing: false,
         },
       }));
-      return;
-    }
-    setApplied((existing) => ({
-      ...existing,
-      [effectId]: {
-        processing: false,
-      },
-    }));
-  }, [applied, writeAsync]);
+    },
+    [applied, writeAsync]
+  );
 
   return { toggleEffect, applied };
 };

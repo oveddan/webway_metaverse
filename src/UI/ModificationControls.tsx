@@ -20,19 +20,22 @@ const ToggleCheckbox = ({
   const { tokenId } = useParams<{
     tokenId: string;
   }>();
-
+  
   const toggleEffect = useToggleEffectContract(+tokenId, key);
 
   const handleClick = useCallback(
+
     (e: SyntheticEvent) => {
       // e.preventDefault();
       // e.stopPropagation();
 
       if (tokenId) {
-        toggleEffect.toggleEffect();
+
+      toggleEffect.toggleEffect();
       } else {
         toggle(key);
       }
+
     },
     [key, toggle, toggleEffect, tokenId]
   );
