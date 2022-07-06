@@ -118,10 +118,10 @@ const publishFileUsingIpfsPost = async (url: string) => {
   return toIpfsAddress(result.cid);
 };
 
-const publishBlobToNftStorage = async (url: string) => {
+const publishBlobToNftStorage = async (url: string, overrideFileType = undefined) => {
   const filePath = await downloadTempFile(url);
 
-  const file = await fileFromPath(filePath);
+  const file = await fileFromPath(filePath, overrideFileType);
 
   
   const cid = await nftStorage.storeBlob(file);
@@ -137,10 +137,10 @@ const publishBlobToNftStorage = async (url: string) => {
  * @param {string} filePath the path to a file to store
  * @returns {File} a File object containing the file content
  */
-async function fileFromPath(filePath: string) {
+async function fileFromPath(filePath: string, overrideFileType = undefined) {
   const content = await fs.promises.readFile(filePath);
   // @ts-ignore
-  const type = mime.getType(filePath);
+  const type = overrideFileType || mime.getType(filePath);
   return new File([content], path.basename(filePath), { type });
 }
 
@@ -161,7 +161,7 @@ const publishElementsToIps = async (elements: ElementNodes) => {
             modelConfig: {
               ...element.modelConfig,
               fileUrl: element.modelConfig.fileUrl
-                ? await publishBlobToNftStorage (element.modelConfig.fileUrl)
+                ? await publishBlobToNftStorage(element.modelConfig.fileUrl, "application/octet-stream")
                 : undefined,
             },
           },
@@ -178,7 +178,7 @@ const publishElementsToIps = async (elements: ElementNodes) => {
             imageConfig: {
               ...imageConfig,
               fileUrl: imageConfig.fileUrl
-                ? await publishBlobToNftStorage (imageConfig.fileUrl)
+                ? await publishBlobToNftStorage(imageConfig.fileUrl)
                 : undefined,
             },
           },
@@ -196,7 +196,7 @@ const publishElementsToIps = async (elements: ElementNodes) => {
               ...videoConfig,
               file: {
                 originalUrl: videoConfig?.file?.originalUrl
-                  ? await publishBlobToNftStorage (videoConfig.file.originalUrl)
+                  ? await publishBlobToNftStorage(videoConfig.file.originalUrl)
                   : undefined,
               },
             },
